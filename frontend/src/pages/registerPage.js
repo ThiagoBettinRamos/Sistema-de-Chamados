@@ -35,7 +35,6 @@ const Form = styled.form`
   width: 300px;
   background-color: white;
   padding: 20px;
-  gap: 0.5rem;
   border-radius: 8px;
   color: black;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
@@ -61,23 +60,20 @@ const Button = styled.button`
   }
 `;
 
-const HomePage = () => {
+const RegisterPage = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  const handleRegister = (e) => {
     e.preventDefault();
-    if (username === 'admin' && password === 'senha123') {
-      navigate('/admin');
-      toast.success('Login bem-sucedido!');
-    } else {
-      toast.error('Credenciais inválidas');
-    }
-  };
 
-  const handleRegisterRedirect = () => {
-    navigate('/register');
+    if (username && password) {
+      toast.success('Usuário registrado com sucesso!');
+      navigate('/');
+    } else {
+      toast.error('Por favor, preencha todos os campos!');
+    }
   };
 
   return (
@@ -87,8 +83,8 @@ const HomePage = () => {
       </LogoContainer>
 
       <FormContainer>
-        <Form onSubmit={handleLogin}>
-          <h1 color='black'>Login</h1>
+        <Form onSubmit={handleRegister}>
+          <h1>Registro</h1>
           <label>Nome</label>
           <Input
             type="text"
@@ -103,10 +99,7 @@ const HomePage = () => {
             onChange={(e) => setPassword(e.target.value)}
             required
           />
-          <Button type="submit">Login</Button>
-          <Button type="button" onClick={handleRegisterRedirect}>
-            Registro
-          </Button>
+          <Button type="submit">Registrar</Button>
         </Form>
       </FormContainer>
       <ToastContainer />
@@ -114,4 +107,4 @@ const HomePage = () => {
   );
 };
 
-export default HomePage;
+export default RegisterPage;
