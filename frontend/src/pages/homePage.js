@@ -15,7 +15,7 @@ const LogoContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: white; /* Fundo branco */
+  background-color: white;
   padding: 20px;
 `;
 
