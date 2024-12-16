@@ -1,36 +1,27 @@
-import express, { Application } from "express";
+import express from "express";
 import dotenv from "dotenv";
-import { Sequelize } from "sequelize";
-import routes from "./routes/chamados";
+import cors from "cors";
+import helmet from "helmet";
+import cookieParser from "cookie-parser";
+import usuarioRoutes from "./routes/usuarios";
+import chamadoRoutes from "./routes/chamados";
+import statusChamadoRoutes from "./routes/statusChamado";
 
 dotenv.config();
 
-const sequelize = new Sequelize(
-  process.env.DB_NAME as string,
-  process.env.DB_USER as string,
-  process.env.DB_PASSWORD as string,
-  {
-    host: process.env.DB_HOST,
-    dialect: "postgres",
-    logging: false,
-  }
-);
-
-sequelize
-  .authenticate()
-  .then(() => console.log("Conexão ao banco de dados bem-sucedida!"))
-  .catch((err) => console.error("Erro ao conectar ao banco de dados:", err));
-
-const app: Application = express();
+const app = express();
 
 app.use(express.json());
+app.use(cors());
+app.use(helmet());
+app.use(cookieParser());
 
-app.use("/api", routes);
-
-const PORT = process.env.PORT || 3000;
-
-app.listen(PORT, () => {
-  console.log(`Servidor rodando em http://localhost:${PORT}`);
+app.get("/", (req, res) => {
+  res.status(200).json({ message: "API Sistema de Chamados - Avançada" });
 });
+
+app.use("/api/users", usuarioRoutes);
+app.use("/api/chamados", chamadoRoutes);
+app.use("/api/status", statusChamadoRoutes);
 
 export default app;

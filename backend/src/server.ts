@@ -1,25 +1,43 @@
-import express from "express";
+import app from "./app";
+import { Pool } from "pg";
 import dotenv from "dotenv";
-import sequelize from "./config/database";
-import chamadoRoutes from "./routes/chamados";
 
+// Carrega variáveis de ambiente
 dotenv.config();
 
-const app = express();
+// Configuração da conexão com o banco de dados
+const pool = new Pool({
+  user: process.env.DB_USER || "postgres",
+  host: process.env.DB_HOST || "localhost",
+  database: process.env.DB_NAME || "SistemaDeChamados",
+  password: process.env.DB_PASSWORD || "root",
+  port: Number(process.env.DB_PORT) || 5432, // Porta padrão do PostgreSQL
+});
 
-app.use(express.json());
-app.use("/api/chamados", chamadoRoutes);
-
+// Função para iniciar o servidor
 const startServer = async () => {
   try {
-    await sequelize.authenticate();
-    console.log("Conexão com o banco bem-sucedida.");
-    app.listen(5000, () => {
-      console.log("Servidor rodando em http://localhost:5000");
+    console.log("Tentando conectar ao banco...");
+    // Testa a conexão com o banco de dados
+    const result = await pool.query("SELECT NOW()");
+    console.log(`Banco conectado com sucesso: ${process.env.DB_HOST}:${process.env.DB_PORT}`);
+
+
+    // Inicia o servidor
+    app.listen(PORT, () => {
+      console.log(`Servidor rodando na porta ${PORT}`);
     });
   } catch (error) {
     console.error("Erro ao conectar ao banco:", error);
+    process.exit(1); // Encerra o processo em caso de erro crítico
   }
 };
 
+// Porta onde o servidor irá rodar
+const PORT = process.env.PORT || 3000;
+
+// Inicia o servidor
 startServer();
+
+// Exporta o pool de conexões para ser usado em outras partes do projeto
+export default pool;

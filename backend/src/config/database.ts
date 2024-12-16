@@ -1,17 +1,21 @@
-import { Sequelize } from "sequelize";
+import { Pool } from "pg";
 import dotenv from "dotenv";
 
 dotenv.config();
 
-const sequelize = new Sequelize(
-  process.env.DB_NAME || "SistemaDeChamados",
-  process.env.DB_USER || "postgres",
-  process.env.DB_PASSWORD || "root",
-  {
-    host: process.env.DB_HOST || "localhost",
-    dialect: "postgres",
-    logging: false,
-  }
-);
+const pool = new Pool({
+  user: process.env.DB_USER || "postgres",
+  host: process.env.DB_HOST || "localhost",
+  database: process.env.DB_NAME || "SistemaDeChamados",
+  password: process.env.DB_PASSWORD || "root",
+  port: Number(process.env.DB_PORT) || 5432,
+});
 
-export default sequelize;
+pool.connect()
+  .then(() =>  console.log(`Banco conectado com sucesso: ${process.env.DB_HOST}:${process.env.DB_PORT}`))
+  .catch((error) => {
+    console.error("Erro ao conectar ao banco de dados:", error);
+    process.exit(1);
+  });
+
+export default pool;

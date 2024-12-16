@@ -1,23 +1,33 @@
 {
   "compilerOptions": {
-    "target": "ES6",                                 // Define o nível de suporte do JavaScript (ES6 é uma escolha ideal).
-    "module": "commonjs",                            // Sistema de módulos para o Node.js.
-    "rootDir": "./src",                              // Diretório principal para os arquivos TypeScript.
-    "outDir": "./dist",                              // Diretório de saída para os arquivos compilados.
-    "strict": true,                                  // Ativa verificações de tipo estritas.
-    "esModuleInterop": true,                         // Facilita a importação de módulos CommonJS no estilo ES6.
-    "forceConsistentCasingInFileNames": true,        // Garante consistência de nomes em imports.
-    "skipLibCheck": true,                            // Ignora a verificação de tipos em arquivos `.d.ts`.
-    "resolveJsonModule": true,                       // Permite importar arquivos `.json`.
-    "baseUrl": "./src",                              // Define a base para os imports relativos.
+    "target": "ES6",                                 
+    "module": "commonjs",                            
+    "rootDir": "./src",                              
+    "outDir": "./dist",                              
+    "strict": true,                                  
+    "esModuleInterop": true,                         
+    "forceConsistentCasingInFileNames": true,        
+    "skipLibCheck": true,                            
+    "resolveJsonModule": true,                       
+    "baseUrl": "./src",                              
     "paths": {
-      "*": ["node_modules/*"]                        // Resolve paths relativos com suporte a `node_modules`.
+      "*": ["node_modules/*"]
     },
-    "typeRoots": ["./node_modules/@types"],          // Declarações de tipos para bibliotecas.
-    "declaration": true,                             // Gera arquivos `.d.ts` (declarações de tipos).
-    "declarationMap": true,                          // Cria mapas de declarações de tipos.
-    "sourceMap": true                                // Gera mapas de código fonte para debug.
+    "typeRoots": [
+      "./node_modules/@types",
+      "./src/@types"
+    ],                                 
+    "declaration": true,                             
+    "declarationMap": true,                          
+    "sourceMap": true,                               
+    "allowSyntheticDefaultImports": true,           
+    "noImplicitAny": false,                         
+    "experimentalDecorators": true,                 
+    "emitDecoratorMetadata": true                   
   },
-  "include": ["src/**/*.ts"],                        // Inclui arquivos na compilação.
-  "exclude": ["node_modules", "dist", "**/*.test.ts"] // Exclui arquivos/pastas da compilação.
+  "include": [
+  "src/**/*.ts",
+  "src/@types/**/*.d.ts"
+],                        
+  "exclude": ["node_modules", "dist", "**/*.test.ts"]
 }
