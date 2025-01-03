@@ -42,9 +42,18 @@ export const criarChamado = async (req: Request, res: Response) => {
 export const listarChamados = async (req: Request, res: Response) => {
   try {
     const query = `
-      SELECT id, usuario_id, setor, descricao, status, data_hora, data_atualizacao
+      SELECT 
+        chamados.id, 
+        chamados.usuario_id, 
+        usuarios.nome AS usuario_nome, 
+        chamados.setor, 
+        chamados.descricao, 
+        chamados.status, 
+        chamados.data_hora, 
+        chamados.data_atualizacao
       FROM chamados
-      ORDER BY data_hora DESC
+      JOIN usuarios ON chamados.usuario_id = usuarios.id
+      ORDER BY chamados.data_hora DESC
     `;
 
     const result = await pool.query(query);
@@ -52,6 +61,30 @@ export const listarChamados = async (req: Request, res: Response) => {
     res.status(200).json({ chamados: result.rows });
   } catch (error) {
     console.error("Erro ao listar chamados:", error);
+    res.status(500).json({ message: "Erro ao listar chamados." });
+  }
+};
+
+export const listarChamadosUser = async (req: Request, res: Response) => {
+  try {
+    const { usuario_id } = req.query;
+
+    if (!usuario_id) {
+      return res.status(400).json({ message: "Usuário não especificado." });
+    }
+
+    const query = `
+      SELECT id, usuario_id, setor, descricao, status, data_hora, data_atualizacao
+      FROM chamados
+      WHERE usuario_id = $1
+      ORDER BY data_hora DESC
+    `;
+
+    const result = await pool.query(query, [usuario_id]);
+
+    res.status(200).json({ chamados: result.rows });
+  } catch (error) {
+    console.error("Erro ao listar chamados do usuário:", error);
     res.status(500).json({ message: "Erro ao listar chamados." });
   }
 };

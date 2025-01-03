@@ -1,43 +1,66 @@
-import app from "./app";
+import express from "express";
+import { createServer } from "http";
+import { Server } from "socket.io";
 import { Pool } from "pg";
 import dotenv from "dotenv";
+import cors from "cors";
+import helmet from "helmet";
+import cookieParser from "cookie-parser";
+import usuarioRoutes from "./routes/usuarioRoutes";
+import chamadoRoutes from "./routes/chamados";
+import statusRoutes from "./routes/statusChamado";
 
-// Carrega variáveis de ambiente
 dotenv.config();
 
-// Configuração da conexão com o banco de dados
+const app = express();
+const httpServer = createServer(app);
+const io = new Server(httpServer, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST", "PATCH", "DELETE"],
+  },
+});
+
 const pool = new Pool({
   user: process.env.DB_USER || "postgres",
   host: process.env.DB_HOST || "localhost",
   database: process.env.DB_NAME || "SistemaDeChamados",
   password: process.env.DB_PASSWORD || "root",
-  port: Number(process.env.DB_PORT) || 5432, // Porta padrão do PostgreSQL
+  port: Number(process.env.DB_PORT) || 5432,
 });
 
-// Função para iniciar o servidor
-const startServer = async () => {
-  try {
-    console.log("Tentando conectar ao banco...");
-    // Testa a conexão com o banco de dados
-    const result = await pool.query("SELECT NOW()");
-    console.log(`Banco conectado com sucesso: ${process.env.DB_HOST}:${process.env.DB_PORT}`);
+app.use(express.json());
+app.use(cors());
+app.use(helmet());
+app.use(cookieParser());
 
+pool.connect()
+  .then(() => console.log("Conectado ao banco de dados com sucesso!"))
+  .catch((error) => {
+    console.error("Erro ao conectar ao banco de dados:", error);
+    process.exit(1);
+  });
 
-    // Inicia o servidor
-    app.listen(PORT, () => {
-      console.log(`Servidor rodando na porta ${PORT}`);
-    });
-  } catch (error) {
-    console.error("Erro ao conectar ao banco:", error);
-    process.exit(1); // Encerra o processo em caso de erro crítico
-  }
-};
+app.use("/api/users", usuarioRoutes);
+app.use("/api/chamados", chamadoRoutes);
+app.use("/api/status", statusRoutes);
 
-// Porta onde o servidor irá rodar
+app.get("/", (req, res) => {
+  res.status(200).json({ message: "Bem-vindo ao Sistema de Chamados - Backend" });
+});
+
+io.on("connection", (socket) => {
+  console.log(`Novo cliente conectado: ${socket.id}`);
+
+  socket.on("disconnect", () => {
+    console.log(`Cliente desconectado: ${socket.id}`);
+  });
+});
+
 const PORT = process.env.PORT || 3000;
 
-// Inicia o servidor
-startServer();
+httpServer.listen(PORT, () => {
+  console.log(`Servidor rodando na porta ${PORT}`);
+});
 
-// Exporta o pool de conexões para ser usado em outras partes do projeto
-export default pool;
+export { app, io, httpServer, pool };

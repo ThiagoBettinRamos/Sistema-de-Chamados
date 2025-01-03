@@ -1,85 +1,52 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import styled from 'styled-components';
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import logo from "../img/images.png";
-
-const Container = styled.div`
-  display: flex;
-  height: 100vh;
-`;
-
-const LogoContainer = styled.div`
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: white; /* Fundo branco */
-  padding: 20px;
-`;
-
-const FormContainer = styled.div`
-  flex: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 20px;
-  background-color: #007bff;
-  color: white;
-`;
-
-const Form = styled.form`
-  display: flex;
-  flex-direction: column;
-  width: 300px;
-  background-color: white;
-  padding: 20px;
-  border-radius: 8px;
-  color: black;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-`;
-
-const Input = styled.input`
-  margin-bottom: 15px;
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-`;
-
-const Button = styled.button`
-  padding: 10px;
-  background-color: #28a745;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-
-  &:hover {
-    background-color: #218838;
-  }
-`;
+import { Container, LogoContainer, Form, FormContainer, Input, Button } from "./styles/registerStyle";
 
 const RegisterPage = () => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
-  const handleRegister = (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
 
-    if (username && password) {
-      toast.success('Usuário registrado com sucesso!');
-      navigate('/');
-    } else {
-      toast.error('Por favor, preencha todos os campos!');
+    try {
+      if (!name || !email || !password) {
+        toast.error("Por favor, preencha todos os campos!");
+        return;
+      }
+
+      const response = await axios.post("http://localhost:3000/api/users", {
+        nome: name,
+        email,
+        senha: password,
+        isAdmin: false,
+      });
+
+      toast.success("Usuário registrado com sucesso!");
+      console.log("Usuário criado com sucesso:", response.data);
+
+      navigate("/");
+    } catch (error) {
+      console.error("Erro ao registrar usuário:", error);
+
+      if (error.response && error.response.status === 400) {
+        toast.error("Email já está em uso!");
+      } else {
+        toast.error("Erro ao registrar usuário. Tente novamente mais tarde.");
+      }
     }
   };
 
   return (
     <Container>
       <LogoContainer>
-        <img src={logo} alt="Logo" style={{ maxWidth: '100%', maxHeight: '80%' }} />
+        <img src={logo} alt="Logo" style={{ maxWidth: "100%", maxHeight: "80%" }} />
       </LogoContainer>
 
       <FormContainer>
@@ -88,8 +55,15 @@ const RegisterPage = () => {
           <label>Nome</label>
           <Input
             type="text"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+          />
+          <label>Email</label>
+          <Input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             required
           />
           <label>Senha</label>

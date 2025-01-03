@@ -1,10 +1,8 @@
 import { Router } from "express";
-import {
-  criarStatus,
-} from "../controllers/statusController";
+import { atualizarStatusChamado } from "../controllers/statusController";
 
 const router = Router();
 
-router.post("/", criarStatus);
+router.patch("/:id", atualizarStatusChamado);
 
 export default router;

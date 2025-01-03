@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 import helmet from "helmet";
 import cookieParser from "cookie-parser";
-import usuarioRoutes from "./routes/usuarios";
+import usuarioRoutes from "./routes/usuarioRoutes";
 import chamadoRoutes from "./routes/chamados";
 import statusChamadoRoutes from "./routes/statusChamado";
 
@@ -23,5 +23,21 @@ app.get("/", (req, res) => {
 app.use("/api/users", usuarioRoutes);
 app.use("/api/chamados", chamadoRoutes);
 app.use("/api/status", statusChamadoRoutes);
+
+app._router.stack.forEach((middleware) => {
+  if (middleware.route) {
+    console.log(
+      `Método: ${Object.keys(middleware.route.methods).join(", ").toUpperCase()} - Rota: ${middleware.route.path}`
+    );
+  } else if (middleware.name === "router") {
+    middleware.handle.stack.forEach((nestedMiddleware) => {
+      if (nestedMiddleware.route) {
+        console.log(
+          `Método: ${Object.keys(nestedMiddleware.route.methods).join(", ").toUpperCase()} - Rota: ${nestedMiddleware.route.path}`
+        );
+      }
+    });
+  }
+});
 
 export default app;
